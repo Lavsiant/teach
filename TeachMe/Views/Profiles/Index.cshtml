@@ -1,0 +1,181 @@
+﻿@model TeachMe.Models.AccountViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-9">
+                <div class="teacher-content">
+                    <section id="teacher-info">
+                        <div class="teacher-photo"><img src="/images/avatars/@Model.User.ImageName" style="max-height:270px" /></div>
+                        <div class="info-inner">
+                            <div class="teacher-name">
+                                @ViewData["lol"]
+                                <h1>@Model.User.FirstName @Model.User.LastName</h1>
+                            </div>
+                            <div class="teacher-rating">
+                                <div class="teacher-stars">
+                                    @for (int i = 0; i < (int)Model.User.FinalRating; i++)
+                                    {
+                                        <abbr title="@Model.User.FinalRating"><span name="stars" class="star"><i class="fas fa-star"></i></span></abbr>
+
+                                    }
+
+                                </div>
+
+                            </div>
+                            <div class="teacher-description">
+                                <p>
+                                    @Model.User.Biography
+                                </p>
+                                <br />
+                                <b>City:</b> @Model.User.City <br />
+                                <b>
+                                    Email:
+                                </b> @Model.User.City <br />
+                                <b>
+                                    Appear.In :
+                                </b><a href="https://appear.in/@Model.User.Skype"> @Model.User.Skype </a><br />
+
+
+                                @if (Model.isReadyForRate)
+                                {
+                                    <h2>Rate Teacher <br /></h2>
+                                    <div id="reviewStars-input">
+                                        <a asp-controller="Profiles" asp-action="RateProfile" asp-route-id="@Model.User.Id" asp-route-mark="1">1</a>
+                                        <a asp-controller="Profiles" asp-action="RateProfile" asp-route-id="@Model.User.Id" asp-route-mark="2">2</a>
+                                        <a asp-controller="Profiles" asp-action="RateProfile" asp-route-id="@Model.User.Id" asp-route-mark="3">3</a>
+                                        <a asp-controller="Profiles" asp-action="RateProfile" asp-route-id="@Model.User.Id" asp-route-mark="4">4</a>
+                                        <a asp-controller="Profiles" asp-action="RateProfile" asp-route-id="@Model.User.Id" asp-route-mark="5">5</a>
+
+
+
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="teacher-info-inner">
+                                <div class="info-icon"><i class="fas fa-users"></i></div>
+                                <span class="info-value">@Model.User.SummaryStudentsNumber students</span>
+                            </div>
+                            <div class="teacher-info-inner">
+                                <div class="info-icon"><i class="fas fa-book"></i></div>
+                                @foreach (var subj in Model.Subjects)
+                                {
+                                    <a asp-controller="Courses" asp-action="Index" asp-route-courseSubject="@subj">@subj | </a>
+                                }
+
+                            </div>
+
+                        </div>
+                    </section>
+                    <section id="teacher-certificates">
+                        @if (Model.User.Certificats.Count > 0)
+                        {
+                            <div class="section-title-2">
+                                <h2>Sertificates</h2>
+                            </div>
+                            <ul class="certificates-list">
+                                @foreach (var cert in Model.User.Certificats)
+                                {
+                                    <li class="certificate-item"><img src="/images/certificates/@cert.value" alt="Сертификат"></li>
+                                }
+
+                            </ul>
+                        }
+                    </section>
+
+                    <section id="my-programs">
+                        @if (Model.User.StudentCourses.Count > 0)
+                        {
+                            <div class="section-title-2">
+                                <h2>Subscribed courses</h2>
+                            </div>
+                            <ul class="my-programs-list">
+                                @foreach (var item in Model.User.StudentCourses.GroupBy(x => x.value))
+                                {
+                                    <li class="my-program-item"><a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@item.Key">@item.Key</a></li>
+
+                                }
+                            </ul>
+                        }
+                    </section>
+
+                    <section id="teacher-comments">
+                        <div class="section-title-2">
+                            <h2>Отзывы</h2>
+                        </div>
+
+                        <ul class="comment-list">
+
+                            @foreach (var comment in Model.User.Comments)
+                            {
+                                <li class="comment-item">
+                                    <h3 class="user-name">@comment.CommentatorFullName</h3>
+                                    <p class="user-comment">@comment.Text</p>
+                                    <div class="comment-info-inner">
+                                        <div class="info-icon"><i class="fas fa-book"></i></div>
+
+                                    </div>
+                                    <div class="comment-info-inner">
+                                        <div class="info-icon"><i class="far fa-clock"></i></div>
+                                        <span class="info-value">@comment.Date</span>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+
+                    </section>
+                    @if (Model.isReadyForComment || true)
+                    {
+                        <section id="teacher-comments">
+
+                            <div class="section-title-2">
+                                <h2>Write comment</h2>
+                            </div>
+                            <form asp-controller="Profiles" asp-action="Comment">
+                                <input type="hidden" asp-for="@Model.User.Id" />
+                                <textarea asp-for="CommentText" cols="40" rows="5"></textarea>
+                                <input class="btn btn-default" style=" margin-top: 100px; margin-left:-300px" type="submit" value="Comment" />
+                            </form>
+
+                        </section>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-12 col-lg-3">
+                <div class="teacher-use-box">
+                    <div class="teacher-programs">
+                        <div class="section-title-2">
+                            <h2>Leading Courses</h2>
+                        </div>
+                        <ul class="teacher-programs-list">
+                            @foreach (var course in @Model.CourseTittles)
+                            {
+                                <li class="program-item"><a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@course">@course</a></li>
+                            }
+
+                        </ul>
+
+                        @if (Model.User.Certificats.Count > 0 && !String.IsNullOrEmpty(Model.User.Email) && !String.IsNullOrEmpty(Model.User.Skype) && Model.User.Biography != null)
+                        {
+
+                            <p>
+                                @if(Model.IsReadyForCreate)
+                                {
+                                <a asp-controller="Courses" asp-action="Create">Create New</a>
+                                }
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>

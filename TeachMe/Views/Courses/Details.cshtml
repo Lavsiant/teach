@@ -1,0 +1,171 @@
+﻿@model TeachMe.Models.CourseModels.DetailsViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+@inject UserManager<ApplicationUser> UserManager
+
+
+<div>
+    <div class="program-wrapper">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-12 col-md-12 col-lg-9">
+                    <div class="program-content">
+
+                        <section id="program-info">
+
+                            <div class="info-inner">
+
+                                <div class="program-name">
+                                    <h1>@Model.Course.Title</h1>
+                                </div>
+                                @if (!Model.Course.IsActive)
+                                {
+                                    <h2><font color="red"> Course is unactive</font></h2>
+                                }
+                                <div class="program-rating">
+                                    <div class="program-stars">
+                                        @for (int i = 0; i < Model.Course.FinalRating; i++)
+    {
+                                    <abrr title="@Model.Course.FinalRating">
+                                        <span name="stars" class="star"><i class="fas fa-star"></i></span>
+                                    </abrr>
+}
+                                      
+                                    </div>
+
+                                </div>
+                                <div class="program-info-inner">
+
+                                    <p>
+                                        <h2>
+                                            Subject:
+                                            <a asp-controller="Courses" asp-action="SearchBySubject" asp-route-subject="@Model.Course.Subject">@Model.Course.Subject</a>
+                                            <br />
+                                            Price
+                                            @Html.DisplayFor(x => Model.Course.Price)
+                                            <br />
+                                            Teacher:
+                                            <a asp-area="" asp-controller="Profiles" asp-action="Index" asp-route-id="@Model.Course.TeacherID" title="Manage"> @Model.Course.TeacherInfo.FirstName @Model.Course.TeacherInfo.LastName</a>
+                                            <br />
+                                            <br />
+                                            Description:
+                                        </h2>
+
+
+                                    </p>
+                                </div>
+
+                                <div class="info-inner">
+
+                                    <div class="program-description">
+                                        <p>
+                                            @Model.Course.Description
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="program-info-inner">
+                                    <p>
+                                        <h2>
+                                            Details:
+                                            <br />
+                                        </h2>
+                                    </p>
+                                </div>
+
+                                <div class="info-inner">
+
+                                    <div class="program-description">
+                                        <p>
+                                            Release date: @Model.Course.ReleaseDate <br />
+                                            Lesson per week: @Model.Course.LessonsNumber <br />
+                                            Lesson duration: @Model.Course.Duration.Hours:@Model.Course.Duration.Minutes
+                                        </p>
+                                    </div>
+                                </div>
+                                @if (Model.Course.TeacherID != UserManager.GetUserId(User) && Model.Course.IsActive && Model.IsValidForSubscribe)
+                                {
+                                    <button type="button"><a asp-action="Subscribe" asp-route-id="@Model.Course.ID"><font color="white">Subscribe</font></a></button>
+                                }
+                            </div>
+
+                        </section>
+
+
+                        @*<section id="program-lessons">
+
+                                <div class="section-title-2">
+                                    <h2>Программа курса</h2>
+                                </div>
+
+                                <ol class="lessons-list">
+                                    <li class="lesson-item">Section Intro: Setting up Your Compute</li>
+                                    <li class="lesson-item">Installing Visual Studio Code</li>
+                                    <li class="lesson-item">Installing Node.js</li>
+                                    <li class="lesson-item">Introduction to the Terminal</li>
+                                </ol>
+
+                            </section>
+
+
+
+                            <div class="col-md-12 col-lg-3">
+                                <div class="program-use-box">
+
+                                    <div class="program-price"><span class="price">@Html.DisplayFor(x => Model.Course.Price)</span>$</div>
+
+                                    <ul class="program-short-info">
+                                        <li>29,5 часа видео по требованию</li>
+                                        <li>128 дополнительных ресурсов</li>
+                                        <li>Сертификат об окончании</li>
+                                    </ul>
+
+                                    <div class="register-course">
+                                        <button type="button">Записатсья на курс</button>
+                                    </div>
+
+                                </div>
+                            </div>*@
+                        @if (Model.isReadtForRate)
+                        {
+                            <h2>Rate Course <br /></h2>
+                            <div id="reviewStars-input">
+                                <a asp-controller="Courses" asp-action="RateCourse" asp-route-id="@Model.Course.ID" asp-route-mark="1">1</a>
+                                <a asp-controller="Courses" asp-action="RateCourse" asp-route-id="@Model.Course.ID" asp-route-mark="2">2</a>
+                                <a asp-controller="Courses" asp-action="RateCourse" asp-route-id="@Model.Course.ID" asp-route-mark="3">3</a>
+                                <a asp-controller="Courses" asp-action="RateCourse" asp-route-id="@Model.Course.ID" asp-route-mark="4">4</a>
+                                <a asp-controller="Courses" asp-action="RateCourse" asp-route-id="@Model.Course.ID" asp-route-mark="5">5</a>
+
+
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            @if (UserManager.GetUserId(User) == Model.Course.TeacherID)
+            {
+                @*<a asp-action="Edit" asp-route-id="@Model.Course.ID">Edit</a>*@
+                @if (Model.Course.IsActive)
+                {
+                    <a asp-action="Delete" asp-route-id="@Model.Course.ID">Unactive</a>
+                }
+                @if (!Model.Course.IsActive)
+                {
+                    <a asp-action="Recovery" asp-route-id="@Model.Course.ID">Active</a>
+
+                }
+            }
+            @if (UserManager.GetUserId(User) != Model.Course.TeacherID)
+            {
+
+            }
+
+            <a asp-action="Index">Back to List</a>
+        </div>
+    </div>
+</div>

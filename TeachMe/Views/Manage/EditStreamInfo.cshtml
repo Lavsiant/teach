@@ -1,0 +1,21 @@
+﻿@model StreamViewModel
+@{
+    ViewData["Title"] = "EditStreamInfo";
+}
+
+<form method="post"  asp-controller="Manage" asp-action="EditStreamInfo">
+    >
+    <div class="form-group">
+        <label asp-for="StreamLink"></label>
+        <input asp-for="StreamLink" class="form-control" />
+        <span asp-validation-for="StreamLink" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Tittle"></label>
+        <input asp-for="Tittle" class="form-control" />
+        <span asp-validation-for="Tittle" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-default">Save</button>
+</form>

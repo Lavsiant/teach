@@ -1,0 +1,44 @@
+﻿@model TeachMe.Models.ManageViewModels.SheduleViewModel
+@{
+    ViewData["Title"] = "Shedule";
+}
+<h1>I'm student</h1>
+@foreach (var item in Model.StudentLessons)
+{
+<p>
+    <a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@item.CourseTittle">@item.CourseTittle</a> <span style='padding-left:10px;'> </span>
+    <b>
+      | DayOfWeek:
+    </b>@item.WeekDay <span style='padding-left:10px;'> </span>
+
+    <b>Time:</b>@item.StartLessonTime.Hour:@item.StartLessonTime.Minute-@item.EndLessonTime.Hour:@item.EndLessonTime.Minute
+  
+    <b>| Teacher: </b>  <a asp-area="" asp-controller="Profiles" asp-action="Index" asp-route-id="@item.TeacherId" title="Manage"> @item.UserShortInfo.FirstName @item.UserShortInfo.LastName</a>
+    <br/><b>Appear In: </b> <a href="https://appear.in/@item.UserShortInfo.AppearIn">@item.UserShortInfo.AppearIn  </a>
+                      <b><a asp-controller="Manage" asp-action="DeleteTeacherCourse" asp-route-courseTittle="@item.CourseTittle" asp-route-startLessonHour="@item.StartLessonTime.Hour" asp-route-startLessonMinute="@item.StartLessonTime.Minute" asp-route-weekDay="@item.WeekDay.ToString()" asp-route-studentId="@Model.UserId" asp-route-teacherId="@item.TeacherId"> | Unsubsribe </a> 
+  
+    @*<a asp-controller="Manage" asp-action="NotificateTeacher" asp-route-email="@item.TeacherId"> Notificate teacher</a>*@
+    </b>
+  
+</p>
+    <p></p>
+}
+
+<h1>I'm teacher</h1>
+@foreach (var item in Model.TeacherLesson)
+{
+<p>
+    <a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@item.CourseTittle">@item.CourseTittle</a> <span style='padding-left:10px;'> </span>
+    <b>
+        DayOfWeek:
+    </b>@item.WeekDay <span style='padding-left:10px;'> </span>
+
+    <b>Time:</b>@item.StartLessonTime.Hour:@item.StartLessonTime.Minute-@item.StartLessonTime.Hour:@item.StartLessonTime.Minute
+    <br />
+    <b>Student: </b>  <a asp-area="" asp-controller="Profiles" asp-action="Index" asp-route-id="@item.TeacherId" title="Manage"> @item.UserShortInfo.FirstName @item.UserShortInfo.LastName</a>
+    @*<a asp-controller="Manage" asp-action="DeleteTeacherCourse" asp-route-courseTittle="@item.CourseTittle" asp-route-startLessonHour="@item.StartLessonTime.Hour" asp-route-startLessonMinute="@item.StartLessonTime.Minute" asp-route-weekDay="@item.WeekDay.ToString()" asp-route-studentId="@item.StudentId"> Delete </a>*@
+</p>
+    <p></p>
+}
+
+

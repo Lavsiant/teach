@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TeachMe</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/bootstrap-grid.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/fontawesome-all.min.css" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+
+    </environment>
+</head>
+<body>
+    <header id="site-header">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="site-header-inner">
+                        <div class="logo">
+                            <h1> <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand"><img src="images/logo.png" alt="teachme"></a></h1>
+                        </div>
+                        <div class="site-menu-wrapper">
+                            <nav id="site-menu">
+                                <ul class="site-menu-links">
+                                    <!--Duplicate for adding new link-->
+                                    <li class="site-menu-link">
+                                        <a asp-area="" asp-controller="Courses" asp-action="Index" class="navbar-brand"><i class="fas fa-th"></i>Catalog</a>
+                                        <button class="toggle-dropdown"><i class="fas fa-angle-right"></i></button>
+                                  
+                                    </li>
+                                    <li class="site-menu-link">
+                                        <a asp-controller="Teachers" asp-action="Index"><i class="fas fa-user"></i>Teachers</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                        <div class="search-wrapper" id="site-search-wrapper">
+                            <form asp-controller="Courses" asp-action="SearchByName" method="get" name="search-form" id="search-form">
+                                <input type="text" name="SearchString" placeholder="Поиск...">
+                                <button type="submit"><i class="fas fa-search"></i></button>
+                            </form>
+                        </div>
+                        @await Html.PartialAsync("_LoginPartial")
+                        <button id="open-mobile-header"><i class="fas fa-bars"></i></button>
+                    </div>
+                    <div class="mobile-header-wrapper">
+                        <div class="overlay"></div>
+                        <div id="mobile-header">
+                            <button id="close-mobile-header"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer id="site-footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="site-footer-inner">
+
+                            <div class="footer-menu-wrapper">
+                                <nav id="footer-menu">
+                                    <ul class="footer-menu-links">
+
+                                        <!--Duplicate for adding new link-->
+                                        <li class="footer-menu-link">
+                                            <a asp-controller="Home" asp-action="Index">Home</a>
+                                        </li>
+                                        <li class="footer-menu-link">
+                                            <a asp-controller="Courses" asp-action="Index">Catalog</a>
+                                        </li>
+                                        <li class="footer-menu-link">
+                                            <a asp-controller="Teachers" asp-action="Index">Teachers</a>
+                                        </li>
+                                        <li class="footer-menu-link">
+                                            <a asp-controller="Home" asp-action="About">Aboutс</a>
+                                        </li>
+                                        <li class="footer-menu-link">
+                                            <a asp-controller="Home" asp-action="Contact">Contaсt</a>
+                                        </li>
+
+                                    </ul>
+                                </nav>
+                            </div>
+
+                            <div class="footer-info">
+
+                                <div class="logo">
+                                    <h1><a href="index.html"><img src="img/logo.png" alt="teachme"></a></h1>
+                                </div>
+
+                                <div class="footer-copyrights">
+                                    <p>Авторские права © 2018 Teachme, Inc.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/main.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

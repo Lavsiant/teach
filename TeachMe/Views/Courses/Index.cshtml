@@ -1,0 +1,89 @@
+﻿@model TeachMe.Models.CourseModels.CourseViewModels.IndexCourseViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+<section id="programs">
+    <div class="container">
+        <div class="row">
+
+            <div class="col">
+
+                <div id="program-filter">
+                    <form asp-controller="Courses" asp-action="Index" method="get">
+                        <p>
+                            Category: <select asp-for="courseCategory" asp-items="Model.categories">
+                                <option value="">All</option>
+                            </select>
+
+                            Sort by: <select asp-for="sortCriteria" asp-items="Model.sortCrtiteriaList">
+                                <option value="">Don't sort</option>
+                            </select>
+
+                            Title: <input type="text" name="SearchString">
+                            Subject: <input type="text" name="courseSubject">
+                            <input type="submit" value="Filter" />
+
+
+                        </p>
+
+                    </form>
+                </div>
+
+                <div class="programs-list">
+                    <div class="row">
+                        @foreach (var item in Model.Courses)
+                        {
+                            <div class="col-12 col-md-4">
+                                <div class="program">
+
+                                    <div class="program-header">
+                                        <div class="program-name"><a asp-action="Details" asp-route-id="@item.ID"><h2>@item.Title</h2></a></div>
+                                        <div class="program-price"><span class="price">@item.Price$/month</span></div>
+                                    </div>
+
+                                    <div class="program-rating">
+
+                                        @for (int i = 0; i < item.FinalRating; i++)
+                                        {
+                                            <abrr title="@item.FinalRating">
+                                                <span name="stars" class="star"><i class="fas fa-star"></i></span>
+                                            </abrr>
+                                        }
+                                     
+
+                                    </div>
+
+                                    <div class="program-info-inner">
+                                        <div class="info-icon"><i class="far fa-clock"></i></div>
+                                        <span class="info-value"> @item.LessonsNumber lessons per week</span>
+                                    </div>
+
+                                    <div class="program-info-inner">
+                                        <div class="info-icon"><i class="fas fa-book"></i></div>
+                                        <span class="info-value"><a asp-controller="Courses" asp-action="SearchBySubject" asp-route-subject="@item.Subject">@item.Subject</a> | @item.Category</span>
+                                    </div>
+
+                                    <div class="program-info-inner">
+                                        <div class="info-icon"><i class="fas fa-user"></i></div>
+
+                                        <span class="info-value">   <a asp-area="" asp-controller="Profiles" asp-action="Index" asp-route-id="@item.TeacherID" title="Manage"> @item.TeacherInfo.FirstName @item.TeacherInfo.LastName</a></span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+

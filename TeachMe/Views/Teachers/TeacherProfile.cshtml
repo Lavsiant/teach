@@ -1,0 +1,118 @@
+﻿@model TeachMe.Models.ApplicationUser
+@{
+    ViewData["Title"] = "TeacherProfile";
+}
+
+<h2>TeacherProfile</h2>
+<body>
+  
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-12 col-lg-9">
+                    <div class="teacher-content">
+                        <section id="teacher-info">
+                            <div class="teacher-photo" style="background-image: url('images/teacher-p.jpg');"></div>
+                            <div class="info-inner">
+                                <div class="teacher-name">
+                                    <h1>@Model.FirstName @Model.LastName</h1>
+                                </div>
+                                <div class="teacher-rating">
+                                    <div class="teacher-stars">
+                                    
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                        <span class="star"><i class="fas fa-star"></i></span>
+                                    </div>
+                                </div>
+                                <div class="teacher-description">
+                                    <p>
+                                        as
+                                    </p>
+                                </div>
+                                <div class="teacher-info-inner">
+                                    <div class="info-icon"><i class="fas fa-users"></i></div>
+                                    <span class="info-value">127 учеников</span>
+                                </div>
+                                <div class="teacher-info-inner">
+                                    <div class="info-icon"><i class="fas fa-book"></i></div>
+                                    <span class="info-value"><a href="#">JavaScript</a></span>
+                                    <span class="info-value"><a href="#">PHP</a></span>
+                                    <span class="info-value"><a href="#">SEO</a></span>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="teacher-certificates">
+                            <div class="section-title-2">
+                                <h2>Сертификаты</h2>
+                            </div>
+                            <ul class="certificates-list">
+                                <li class="certificate-item"><img src="img/certificate.jpg" alt="Сертификат"></li>
+                                <li class="certificate-item"><img src="img/certificate.jpg" alt="Сертификат"></li>
+                                <li class="certificate-item"><img src="img/certificate.jpg" alt="Сертификат"></li>
+                            </ul>
+                        </section>
+                        <section id="teacher-comments">
+                            <div class="section-title-2">
+                                <h2>Отзывы</h2>
+                            </div>
+                            <ul class="comment-list">
+                                <li class="comment-item">
+                                    <h3 class="user-name">Богдан Сашко</h3>
+                                    <p class="user-comment">Отлично, прекрасно, превосходно. Но если честно, то не очень!</p>
+                                    <div class="comment-info-inner">
+                                        <div class="info-icon"><i class="fas fa-book"></i></div>
+                                        <span class="info-value"><a href="#">Основы JavaScript</a></span>
+                                    </div>
+                                    <div class="comment-info-inner">
+                                        <div class="info-icon"><i class="far fa-clock"></i></div>
+                                        <span class="info-value">16.04.2018</span>
+                                    </div>
+                                </li>
+                                <li class="comment-item">
+                                    <h3 class="user-name">Богдан Сашко</h3>
+                                    <p class="user-comment">Отлично, прекрасно, превосходно. Но если честно, то не очень!</p>
+                                    <div class="comment-info-inner">
+                                        <div class="info-icon"><i class="fas fa-book"></i></div>
+                                        <span class="info-value"><a href="#">Основы JavaScript</a></span>
+                                    </div>
+                                    <div class="comment-info-inner">
+                                        <div class="info-icon"><i class="far fa-clock"></i></div>
+                                        <span class="info-value">16.04.2018</span>
+                                    </div>
+                                </li>
+                                <li class="comment-item">
+                                    <h3 class="user-name">Богдан Сашко</h3>
+                                    <p class="user-comment">Отлично, прекрасно, превосходно. Но если честно, то не очень!</p>
+                                    <div class="comment-info-inner">
+                                        <div class="info-icon"><i class="fas fa-book"></i></div>
+                                        <span class="info-value"><a href="#">Основы JavaScript</a></span>
+                                    </div>
+                                    <div class="comment-info-inner">
+                                        <div class="info-icon"><i class="far fa-clock"></i></div>
+                                        <span class="info-value">16.04.2018</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </section>
+                    </div>
+                </div>
+                <div class="col-md-12 col-lg-3">
+                    <div class="teacher-use-box">
+                        <div class="teacher-programs">
+                            <div class="section-title-2">
+                                <h2>Программы</h2>
+                            </div>
+                            <ul class="teacher-programs-list">
+                                <li class="program-item"><a href="#">Основы JavaScript</a></li>
+                                <li class="program-item"><a href="#">JavaScript продвинутый</a></li>
+                                <li class="program-item"><a href="#">PHP программирование</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+</body>

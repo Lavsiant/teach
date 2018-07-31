@@ -1,0 +1,112 @@
+﻿@model TeachMe.Models.CourseModels.CourseViewModels.CreateCourseViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Course</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@Model.Course.Title" class="control-label"></label>
+                <input asp-for="@Model.Course.Title" class="form-control" />
+                <span asp-validation-for="@Model.Course.Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="@Model.Course.Description" class="control-label"></label>
+                <input asp-for="@Model.Course.Description" class="form-control" />
+                <span asp-validation-for="@Model.Course.Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="@Model.Course.Category" class="control-label"></label>
+                <select asp-for="@Model.Course.Category" asp-items="@(Html.GetEnumSelectList<TeachMe.Models.CourseModels.CourseCategory>())" class="form-control"></select>
+                <span asp-validation-for="@Model.Course.Category" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Course.Subject" class="control-label"></label>
+                <input asp-for="@Model.Course.Subject" class="form-control" />
+                <span asp-validation-for="@Model.Course.Subject" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="@Model.Course.Price" class="control-label"></label>
+                <input asp-for="@Model.Course.Price" class="form-control" />
+                <span asp-validation-for="@Model.Course.Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+
+                <table style="width:100%">
+                    <tr>
+                        <th>  <label class="control-label">Hours</label></th>
+                        <th>  <label class="control-label">Minutes</label></th>
+                    </tr>
+                    <tr>
+                        <th>
+                            <input asp-for="@Model.Course.Duration.Hours" class="form-control" max="4" min="1" />
+                            @*<span asp-validation-for="@Model.Course.Duration.Hours" class="text-danger"></span>*@
+                        </th>
+
+                        <th>
+                            <input asp-for="@Model.Course.Duration.Minutes" class="form-control" max="59" min="0" />
+                            @*<span asp-validation-for="@Model.Course.Duration.Minutes" class="text-danger"></span>*@
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            <span asp-validation-for="@Model.Course.Duration.Hours" class="text-danger"></span>
+                            <span asp-validation-for="@Model.Course.Duration.Minutes" class="text-danger"></span>
+                        </th>
+                    </tr>
+
+
+                </table>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="@Model.Course.LessonsNumber" class="control-label"></label>
+                <input asp-for="@Model.Course.LessonsNumber" class="form-control" />
+                <span asp-validation-for="@Model.Course.LessonsNumber" class="text-danger"></span>
+                <input asp-for="@Model.Course.LessonSchedule" />
+            </div>
+
+
+            <dl>
+                @for (var i = 0; i < Enum.GetNames(typeof(DayOfWeek)).Length; i++)  // pomenyat'
+                {
+                    <dt>
+                        <input type="checkbox" asp-for="@Model.WeekDays[i].IsWorkDay" />
+                        @Model.WeekDays[i].WeekDay
+
+                        <input asp-for="@Model.WeekDays[i].WeekDay" />
+                        From
+                        <input asp-for="@Model.WeekDays[i].StartTime" style="width: 70px; text-align: center;" min="0" max="24" />
+                        <span asp-validation-for="@Model.WeekDays[i].StartTime" class="text-danger"></span>
+                        To
+                        <input asp-for="@Model.WeekDays[i].EndTime" style="width: 70px; text-align: center;" min="0" max="25" />
+                        <span asp-validation-for="@Model.WeekDays[i].EndTime" class="text-danger"></span>
+                    </dt>
+                }
+            </dl>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
