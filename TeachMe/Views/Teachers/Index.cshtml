@@ -70,7 +70,7 @@
                                             <div class="info-icon"><i class="fas fa-book"></i></div>
                                             @foreach (var item in teacher.CreatedCourses)
                                             {
-                                                <span class="info-value"><a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@item.value">@item.value</a></span>
+                                                <span class="info-value"><a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@item.Title">@item.Title</a></span>
                                             }
 
                                          

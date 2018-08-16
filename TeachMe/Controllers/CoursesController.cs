@@ -7,36 +7,33 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TeachMe.Data;
+using Model.CourseModel;
+using Model.UserModel;
 using TeachMe.Models;
 using TeachMe.Models.AccountViewModels;
 using TeachMe.Models.CourseModels;
 using TeachMe.Models.CourseModels.CourseViewModels;
-using TeachMe.Repositories;
 using TeachMe.Services;
 using TeachMe.Services.FilterServices;
+using TeachMe.Services.Implementations;
+using TeachMe.Services.Interfaces;
 
 namespace TeachMe.Controllers
 {
     public class CoursesController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _manager;
-        private readonly ViewModelsProvider _vmProvider;
-        private readonly CourseRepository _courseRepository;
-        private readonly UserRepository _userRepository;
+        private readonly IViewModelProvider _vmProvider;
+        private readonly ICourseService _courseService;
+        private readonly IUserService _userService;
 
-
-        public CoursesController(ApplicationDbContext context, UserManager<ApplicationUser> manager)
+        public CoursesController( UserManager<ApplicationUser> manager,IViewModelProvider vmprovider, IUserService userService,ICourseService courseService)
         {
          
             _manager = manager;
-            _context = context;
-            _courseRepository = new CourseRepository(context);
-            _userRepository = new UserRepository(context);
-
-            _vmProvider = new ViewModelsProvider();
-
+            _vmProvider = vmprovider;
+            _userService = userService;
+            _courseService = courseService;          
         }
 
         // GET: Courses
@@ -45,10 +42,11 @@ namespace TeachMe.Controllers
         public async Task<IActionResult> Index(string searchString, string courseSubject, string courseCategory, string sortCriteria)
         {
             var filterService = new CourseFilterService();
-
-            var courses = filterService.FilterCourseList(_context, searchString, courseSubject, courseCategory, sortCriteria);
+            var courses = await _courseService.GetCourseListWithTeacherInfo();
+            courses = courses.Where(x => x.IsActive).ToList();
+            courses = filterService.FilterCourseList(courses, searchString, courseSubject, courseCategory, sortCriteria);
             var user = await _manager.GetUserAsync(User);
-            var indexVM = _vmProvider.GetIndexCourseViewModel(courses, _context, user);
+            var indexVM = await _vmProvider.GetIndexCourseViewModel(courses, user);
 
             return View(indexVM);
         }
@@ -64,7 +62,7 @@ namespace TeachMe.Controllers
          
             var ratingService = new FeedbackService();
 
-            var course = _courseRepository.GetSingleFullCourse(id);
+            var course =await _courseService.GetSingleFullCourse(id);
             var teacher = await _manager.FindByIdAsync(course.TeacherID);
             var currentUser = await _manager.GetUserAsync(User);
 
@@ -73,8 +71,8 @@ namespace TeachMe.Controllers
                 return NotFound();
             }
 
-            bool raterMarker = ratingService.CheckIfCourseRaterValid(_manager.GetUserId(User),_context,course);
-            bool subscribeMarker = ratingService.CheckIfValidToSubscribe(course.Title, _userRepository.GetUserWithLessonsList(currentUser.Id));
+            bool raterMarker = ratingService.CheckIfCourseRaterValid(_manager.GetUserId(User),await _userService.GetUserWithLessonsList(_manager.GetUserId(User)),course);
+            bool subscribeMarker = ratingService.CheckIfValidToSubscribe(course.Title,await _userService.GetUserWithLessonsList(currentUser.Id));
             return View(new DetailsViewModel() { Course = course, Teacher = teacher, isReadtForRate = raterMarker, IsValidForSubscribe = subscribeMarker});
         }
 
@@ -96,12 +94,12 @@ namespace TeachMe.Controllers
             if (ModelState.IsValid)
             {
                 var helper = await _manager.GetUserAsync(User);
-                var user = _userRepository.GetUserWithLessonsListAndCreatedCourses(helper.Id);
+                var user = await _userService.GetUserWithLessonsListAndCreatedCourses(helper.Id);
                 user.IsTeacher = true;
-                user.CreatedCourses.Add(new CString() { value = courseVM.Course.Title });           
-                await _manager.UpdateAsync(user);
+                user.CreatedCourses.Add(courseVM.Course);           
+                
 
-                await _courseRepository.CreateCourse(courseVM, user);
+                await _courseService.CreateCourse(courseVM, user);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -110,14 +108,11 @@ namespace TeachMe.Controllers
 
 
         // GET: Courses/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+    
 
-            var course = await _context.Course.SingleOrDefaultAsync(m => m.ID == id);
+            var course = await _courseService.GetSingleCourseWithMarks(id);
             if (course == null)
             {
                 return NotFound();
@@ -142,8 +137,7 @@ namespace TeachMe.Controllers
             {
                 try
                 {
-                    _context.Update(course);
-                    await _context.SaveChangesAsync();
+                    await _courseService.UpdateCourse(course);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -171,7 +165,7 @@ namespace TeachMe.Controllers
                 return NotFound();
             }
 
-            var course = _courseRepository.GetSingleFullCourse(id);
+            var course = await _courseService.GetSingleFullCourse(id);
 
             if (course == null)
             {
@@ -182,7 +176,7 @@ namespace TeachMe.Controllers
             var userHelper = await _manager.GetUserAsync(User);
 
             
-            return View(_vmProvider.GetSubscribeViewModel(course, _context, userHelper.Id));
+            return View(await _vmProvider.GetSubscribeViewModel(course, userHelper.Id));
         }
 
         [HttpPost]
@@ -190,20 +184,18 @@ namespace TeachMe.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Subscribe(int? id, SubscribeViewModel subscribeViewModel)
         {
-            var course = _courseRepository.GetSingleCourseWithSchedule(subscribeViewModel.Course.ID);
+            var course = await _courseService.GetSingleCourseWithSchedule(subscribeViewModel.Course.ID);
 
-            await _courseRepository.UpdateCourseSchedule(course, subscribeViewModel.Lessons);
+            await _courseService.UpdateCourseSchedule(course, subscribeViewModel.Lessons);
 
 
 
             var user = await _manager.GetUserAsync(User);
 
+            var student = await _userService.GetUserWithLessonsListAndStudentCourses(user.Id);
+            var teacher = await _userService.GetUserWithLessonsList(subscribeViewModel.Course.TeacherID);
 
-
-            var student = _userRepository.GetUserWithLessonsListAndStudentCourses(user.Id);
-            var teacher = _userRepository.GetUserWithLessonsList(subscribeViewModel.Course.TeacherID);
-
-            await _userRepository.AddSubscribedLessons(student, teacher, subscribeViewModel.Lessons, course, _manager);
+            await _userService.AddSubscribedLessons(student, teacher, subscribeViewModel.Lessons, course, _manager);
 
 
             // var teacher = await _manager.FindByIdAsync(subscribeViewModel.Course.TeacherID);
@@ -214,7 +206,7 @@ namespace TeachMe.Controllers
             await _manager.UpdateAsync(student);
 
             course.SummaryStudentsNumber++;
-            _context.Update(course);
+            await _courseService.UpdateCourse(course);
 
             var es = new EmailSender();
           // await es.SendEmailAsync(course.TeacherInfo.Email, "course enroll", "on your course enrolled");
@@ -225,20 +217,20 @@ namespace TeachMe.Controllers
         
         public async Task<IActionResult> RateCourse(int id, string mark)
         {
-            var course = _courseRepository.GetSingleCourseWithMarks(id);
+            var course = await _courseService.GetSingleCourseWithMarks(id);
             var user = await _manager.GetUserAsync(User);
             var ratingService = new FeedbackService();
-            await _courseRepository.UpdateCourse(ratingService.RateCourse(mark, user.Id, course));
+            await _courseService.UpdateCourse(ratingService.RateCourse(mark, user.Id, course));
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> SearchByName(string searchString)
         {
-            var courses = _courseRepository.GetCourseListWithTeacherInfo();
+            var courses =await _courseService.GetCourseListWithTeacherInfo();
             var filterService = new CourseFilterService();
             courses = filterService.FilterCourseList(courses, searchString, null, null, null);     
 
-            return View("../Courses/Index", _vmProvider.GetIndexCourseViewModel(courses.ToList(),_context,await _manager.GetUserAsync(User)));
+            return View("../Courses/Index",await _vmProvider.GetIndexCourseViewModel(courses.ToList(),await _manager.GetUserAsync(User)));
         }
 
         [Authorize]
@@ -247,12 +239,12 @@ namespace TeachMe.Controllers
             Course course = new Course();
             if (!String.IsNullOrEmpty(searchString))
             {
-                course = _context.Course.Include(x => x.TeacherInfo).Include(x => x.Marks).Include(y => y.WeekPlans).Include(x => x.Duration).FirstOrDefault(x => x.Title.Equals(searchString));
+                course = await _courseService.FindCourseByName(searchString);
             }
             var ratingService = new FeedbackService();
             var currentUser = await _manager.GetUserAsync(User);
-            bool raterMarker = ratingService.CheckIfCourseRaterValid(_manager.GetUserId(User), _context, course);
-            bool subscribeMarker = ratingService.CheckIfValidToSubscribe(course.Title, _userRepository.GetUserWithLessonsList(currentUser.Id));
+            bool raterMarker = ratingService.CheckIfCourseRaterValid(_manager.GetUserId(User), await _userService.GetUserWithLessonsList(_manager.GetUserId(User)), course);
+            bool subscribeMarker = ratingService.CheckIfValidToSubscribe(course.Title,await _userService.GetUserWithLessonsList(currentUser.Id));
 
             return View("../Courses/Details", new DetailsViewModel() { Course = course,isReadtForRate = raterMarker, IsValidForSubscribe = subscribeMarker });
 
@@ -261,12 +253,12 @@ namespace TeachMe.Controllers
 
         public async Task<IActionResult> SearchBySubject(string subject)
         {
-            var courses = _courseRepository.GetCourseListWithTeacherInfo();
+            var courses = await _courseService.GetCourseListWithTeacherInfo();
             var filterService = new CourseFilterService();
             courses = courses.Where(x => x.Subject.Equals(subject)).ToList();
 
 
-            return View("../Courses/Index", _vmProvider.GetIndexCourseViewModel(courses.ToList(), _context, await _manager.GetUserAsync(User)));
+            return View("../Courses/Index",await _vmProvider.GetIndexCourseViewModel(courses.ToList(), await _manager.GetUserAsync(User)));
         }
 
         [Authorize]
@@ -278,15 +270,11 @@ namespace TeachMe.Controllers
         }
 
         // GET: Courses/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+     
 
-            var course = await _context.Course
-                .SingleOrDefaultAsync(m => m.ID == id);
+            var course = await _courseService.GetSingleCourseWithMarks(id);
             if (course == null)
             {
                 return NotFound();
@@ -300,25 +288,26 @@ namespace TeachMe.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var course = await _context.Course.SingleOrDefaultAsync(m => m.ID == id);
+            var course = await _courseService.GetSingleCourseWithMarks(id);
             course.IsActive = false;
-            _context.Update(course);
-            await _context.SaveChangesAsync();
+
+      
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Recovery(int id)
         {
-            var course = await _context.Course.SingleOrDefaultAsync(m => m.ID == id);
+            var course = await _courseService.GetSingleCourseWithMarks(id);
             course.IsActive = true;
-            _context.Update(course);
-            await _context.SaveChangesAsync();
+            await _courseService.UpdateCourse(course);
+            //_context.Update(course);
+            //await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CourseExists(int id)
         {
-            return _context.Course.Any(e => e.ID == id);
+            return true;
         }
     }
 }

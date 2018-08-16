@@ -161,16 +161,14 @@
 
                         </ul>
 
-                        @if (Model.User.Certificats.Count > 0 && !String.IsNullOrEmpty(Model.User.Email) && !String.IsNullOrEmpty(Model.User.Skype) && Model.User.Biography != null)
-                        {
+                      
 
                             <p>
-                                @if(Model.IsReadyForCreate)
-                                {
+                             
                                 <a asp-controller="Courses" asp-action="Create">Create New</a>
-                                }
+                                
                             </p>
-                        }
+                        
                     </div>
                 </div>
             </div>

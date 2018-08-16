@@ -1,5 +1,5 @@
 ﻿@model TeachMe.Models.CourseModels.CourseViewModels.IndexCourseViewModel
-
+@using Model.UserModel
 @{
     ViewData["Title"] = "Index";
 }
@@ -12,8 +12,9 @@
         <div class="row">
 
             <div class="col">
-
+                <a asp-controller="Courses" asp-action="Create">Create New</a>
                 <div id="program-filter">
+
                     <form asp-controller="Courses" asp-action="Index" method="get">
                         <p>
                             Category: <select asp-for="courseCategory" asp-items="Model.categories">
@@ -54,7 +55,7 @@
                                                 <span name="stars" class="star"><i class="fas fa-star"></i></span>
                                             </abrr>
                                         }
-                                     
+
 
                                     </div>
 

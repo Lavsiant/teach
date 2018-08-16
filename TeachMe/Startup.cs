@@ -8,10 +8,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TeachMe.Data;
 using TeachMe.Models;
 using TeachMe.Services;
 using Microsoft.AspNetCore.Http;
+using DBRepository;
+using Model.UserModel;
+using DBRepository.Interfaces;
+using DBRepository.Factories;
+using DBRepository.Repositories;
+using TeachMe.Services.Interfaces;
+using TeachMe.Services.Implementations;
 
 namespace TeachMe
 {
@@ -27,11 +33,11 @@ namespace TeachMe
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<RepositoryContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddEntityFrameworkStores<RepositoryContext>()
                 .AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>
             {
@@ -52,6 +58,14 @@ namespace TeachMe
                 options.User.RequireUniqueEmail = true;
                 options.SignIn.RequireConfirmedEmail = false;
             });
+
+            services.AddScoped<IRepositoryContextFactory, RepositoryContextFactory>();
+            services.AddScoped<IUserRepository>(provider => new UserRepository(Configuration.GetConnectionString("DefaultConnection"), provider.GetService<IRepositoryContextFactory>()));
+            services.AddScoped<ICourseRepository>(provider => new CourseRepository(Configuration.GetConnectionString("DefaultConnection"), provider.GetService<IRepositoryContextFactory>()));
+            services.AddScoped<ICourseService, CourseService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IViewModelProvider, ViewModelProvider>();
+
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 

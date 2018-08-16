@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DBRepository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TeachMe.Data;
+using Model.UserModel;
 using TeachMe.Models;
 using TeachMe.Models.TeachersViewModels;
 
@@ -14,12 +15,11 @@ namespace TeachMe.Controllers
     public class TeachersController : Controller
     {
 
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _manager;
-      
+        private readonly RepositoryContext _context;
+        private readonly UserManager<ApplicationUser> _manager;     
 
 
-        public TeachersController(ApplicationDbContext context, UserManager<ApplicationUser> manager)
+        public TeachersController(RepositoryContext context, UserManager<ApplicationUser> manager)
         {
             //if (httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
             //{
@@ -32,7 +32,7 @@ namespace TeachMe.Controllers
         }
         public IActionResult Index()
         {
-            var userList = _context.Users.Include(x=>x.CreatedCourses).Select(x=>x).Where(x=>x.IsTeacher).OrderBy(x=>x.FinalRating).ToList();
+            var userList = _context.Users.Include(x=>x.CreatedCourses).Where(x=>x.IsTeacher).OrderBy(x=>x.FinalRating).ToList();
             userList.Reverse();
             return View(new TeacherIndexViewModel() { UserList = userList });
         }

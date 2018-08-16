@@ -12,10 +12,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using TeachMe.Data;
+using Model.UserModel;
 using TeachMe.Models;
 using TeachMe.Models.AccountViewModels;
 using TeachMe.Services;
+using TeachMe.Services.Interfaces;
 
 namespace TeachMe.Controllers
 {
@@ -27,7 +28,7 @@ namespace TeachMe.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
-        private readonly ApplicationDbContext _context;
+        private readonly IUserService _userService;
         private readonly IHostingEnvironment _appEnvironment;
 
         public AccountController(
@@ -35,14 +36,15 @@ namespace TeachMe.Controllers
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ILogger<AccountController> logger,
-            ApplicationDbContext context,
+         
+            IUserService userService,
             IHostingEnvironment hostingEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
-            _context = context;
+            _userService = userService;
             _appEnvironment = hostingEnvironment;
         }
 
@@ -229,7 +231,7 @@ namespace TeachMe.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, City=model.City, LastName = model.LastName, FirstName=model.FirstName, Skype=model.Skype};
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, City = model.City, LastName = model.LastName, FirstName = model.FirstName, Skype = model.Skype };
                 user.ImageName = model.Image.FileName;
                 user.Stream = new StreamInfo() { StreamLink = "non", StreamTIttle = "non" };
 
@@ -238,8 +240,8 @@ namespace TeachMe.Controllers
                     var fileName = Path.Combine($"{_appEnvironment.WebRootPath}\\images\\avatars\\", Path.GetFileName(model.Image.FileName));
                     model.Image.CopyTo(new FileStream(fileName, FileMode.Create));
 
-                  
-                 
+
+
                 }
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -248,7 +250,7 @@ namespace TeachMe.Controllers
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                   // await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
+                    // await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation("User created a new account with password.");
@@ -459,8 +461,7 @@ namespace TeachMe.Controllers
 
         public string GetTeacherNameById(string id)
         {
-            var user = _context.Users.Find(id);
-            return $"{user.FirstName} {user.LastName}";
+            return _userService.GetTeacherNameById(id);
         }
 
         #region Helpers
