@@ -28,7 +28,7 @@ namespace TeachMe.Services.Interfaces
 
         Task<ApplicationUser> GetUserWithCertificates(string id);
 
-        Task AddSubscribedLessons(ApplicationUser student, ApplicationUser teacher, IList<CourseLesson> lessons, Course course, UserManager<ApplicationUser> manager);
+        Task AddSubscribedLessons(ApplicationUser student, ApplicationUser teacher, IList<CourseLesson> lessons, Course course, string courseTittle);
 
         Task<ApplicationUser> GetUserWithMarks(string id);
 
@@ -43,5 +43,7 @@ namespace TeachMe.Services.Interfaces
         string GetTeacherNameById(string id);
 
         Task<List<ApplicationUser>> GetUsersWithLessonList();
+
+        Task UpdateUserCertificates(string userId, string path);
     }
 }

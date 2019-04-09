@@ -67,7 +67,7 @@ namespace TeachMe.Services.Implementations
             return await _userRepository.GetUserWithCertificates(id);
         }
 
-        public async Task AddSubscribedLessons(ApplicationUser student, ApplicationUser teacher, IList<CourseLesson> lessons, Course course, UserManager<ApplicationUser> manager)
+        public async Task AddSubscribedLessons(ApplicationUser student, ApplicationUser teacher, IList<CourseLesson> lessons, Course course, string manager)
         {
             await _userRepository.AddSubscribedLessons(student, teacher, lessons, course, manager);
         }
@@ -105,6 +105,11 @@ namespace TeachMe.Services.Implementations
         public async Task<List<ApplicationUser>> GetUsersWithLessonList()
         {
             return await _userRepository.GetUsersWithLessonList(); 
+        }
+
+        public async Task UpdateUserCertificates(string userId, string path)
+        {
+            await _userRepository.UpdateUserCertificates(userId, path);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace DBRepository.Interfaces
 
         Task<ApplicationUser> GetUserWithCertificates(string id);
 
-        Task AddSubscribedLessons(ApplicationUser student, ApplicationUser teacher, IList<CourseLesson> lessons, Course course, UserManager<ApplicationUser> manager);
+        Task AddSubscribedLessons(ApplicationUser student, ApplicationUser teacher, IList<CourseLesson> lessons, Course course, string manager);
 
         Task<ApplicationUser> GetUserWithMarks(string id);
 
@@ -44,6 +44,9 @@ namespace DBRepository.Interfaces
 
         Task<List<ApplicationUser>> GetUsersWithLessonList();
 
-       
+        Task UpdateUserCertificates(string userId, string path);
+
+
+
     }
 }

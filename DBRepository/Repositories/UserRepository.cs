@@ -61,7 +61,7 @@ namespace DBRepository.Repositories
         {
             using (var context = ContextFactory.CreateDbContext(ConnectionString))
             {
-                return await context.Users.Include(x => x.StudentCourses).Include(x => x.Stream).Include(x => x.Comments).Include(x => x.CreatedCourses).FirstOrDefaultAsync(x => x.Id == id);
+                return await context.Users.Include(x => x.StudentCourses).Include(x => x.Stream).Include(x => x.Comments).Include(x=>x.Certificats).Include(x => x.CreatedCourses).FirstOrDefaultAsync(x => x.Id == id);
             }
         }
 
@@ -90,33 +90,41 @@ namespace DBRepository.Repositories
             }
         }
 
-        public async Task AddSubscribedLessons(ApplicationUser student, ApplicationUser teacher, IList<CourseLesson> lessons, Course course, UserManager<ApplicationUser> manager)
+        public async Task AddSubscribedLessons(ApplicationUser student, ApplicationUser teacher, IList<CourseLesson> lessons, Course course, string title)
         {
-            // var teacher = await _manager.FindByIdAsync(subscribeViewModel.Course.TeacherID);
-            foreach (var selectedLesson in lessons.Where(x => x.isBusy))
+            using (var context = ContextFactory.CreateDbContext(ConnectionString))
             {
-                student.LessonsList.Add(new UserCourse()
-                {
-                    StartLessonTime = selectedLesson.StartLessonTime,
-                    EndLessonTime = selectedLesson.EndLessonTime,
-                    CourseTittle = course.Title,
-                    ExpireDate = DateTime.Now.AddDays(28),
-                    WeekDay = selectedLesson.WeekDay,
-                    TeacherId = course.TeacherID
-                });
-                teacher.LessonsList.Add(new UserCourse()
-                {
-                    StartLessonTime = selectedLesson.StartLessonTime,
-                    EndLessonTime = selectedLesson.EndLessonTime,
-                    CourseTittle = course.Title,
-                    ExpireDate = DateTime.Now.AddDays(28),
-                    WeekDay = selectedLesson.WeekDay,
-                    StudentId = student.Id
-                });
-            }
+                student = context.Users.Include(x => x.LessonsList).Include(x=>x.StudentCourses).FirstOrDefault(x=>x.Id == student.Id);
+                teacher = context.Users.Include(x => x.LessonsList).FirstOrDefault(x => x.Id == teacher.Id);
+                teacher.SummaryStudentsNumber++;
 
-            await manager.UpdateAsync(student);
-            await manager.UpdateAsync(teacher);
+                student.StudentCourses.Add(new CString() { value = course.Title });
+                foreach (var selectedLesson in lessons.Where(x => x.isBusy))
+                {
+                    student.LessonsList.Add(new UserCourse()
+                    {
+                        StartLessonTime = selectedLesson.StartLessonTime,
+                        EndLessonTime = selectedLesson.EndLessonTime,
+                        CourseTittle = course.Title,
+                        ExpireDate = DateTime.Now.AddDays(28),
+                        WeekDay = selectedLesson.WeekDay,
+                        TeacherId = course.TeacherID
+                    });
+                    teacher.LessonsList.Add(new UserCourse()
+                    {
+                        StartLessonTime = selectedLesson.StartLessonTime,
+                        EndLessonTime = selectedLesson.EndLessonTime,
+                        CourseTittle = course.Title,
+                        ExpireDate = DateTime.Now.AddDays(28),
+                        WeekDay = selectedLesson.WeekDay,
+                        StudentId = student.Id
+                    });
+                }
+                context.Update(student);
+                context.Update(teacher);
+            }
+            // var teacher = await _manager.FindByIdAsync(subscribeViewModel.Course.TeacherID);
+          
         }
 
 
@@ -208,6 +216,15 @@ namespace DBRepository.Repositories
             }
         }
 
+        public async Task UpdateUserCertificates(string userId, string path)
+        {
+            using (var context = ContextFactory.CreateDbContext(ConnectionString))
+            {
+                var user = await context.Users.Include(x => x.Certificats).FirstOrDefaultAsync(x => x.Id == userId);
+                user.Certificats.Add(new CString() { value = path });
+                context.Update(user);
+            }
+        }
    
     }
 

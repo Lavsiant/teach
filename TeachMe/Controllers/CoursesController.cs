@@ -184,31 +184,34 @@ namespace TeachMe.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Subscribe(int? id, SubscribeViewModel subscribeViewModel)
         {
-            var course = await _courseService.GetSingleCourseWithSchedule(subscribeViewModel.Course.ID);
+            try
+            {
+                var course = await _courseService.GetSingleCourseWithSchedule(subscribeViewModel.Course.ID);
 
-            await _courseService.UpdateCourseSchedule(course, subscribeViewModel.Lessons);
-
-
-
-            var user = await _manager.GetUserAsync(User);
-
-            var student = await _userService.GetUserWithLessonsListAndStudentCourses(user.Id);
-            var teacher = await _userService.GetUserWithLessonsList(subscribeViewModel.Course.TeacherID);
-
-            await _userService.AddSubscribedLessons(student, teacher, subscribeViewModel.Lessons, course, _manager);
+                await _courseService.UpdateCourseSchedule(course, subscribeViewModel.Lessons);
 
 
-            // var teacher = await _manager.FindByIdAsync(subscribeViewModel.Course.TeacherID);
-            teacher.SummaryStudentsNumber++;
-            await _manager.UpdateAsync(teacher);
 
-            student.StudentCourses.Add(new CString() { value = course.Title });
-            await _manager.UpdateAsync(student);
+                var user = await _manager.GetUserAsync(User);
 
-            course.SummaryStudentsNumber++;
-            await _courseService.UpdateCourse(course);
+                var student = await _userService.GetUserWithLessonsListAndStudentCourses(user.Id);
+                var teacher = await _userService.GetUserWithLessonsList(subscribeViewModel.Course.TeacherID);
 
-            var es = new EmailSender();
+                await _userService.AddSubscribedLessons(student, teacher, subscribeViewModel.Lessons, course, course.Title);
+
+
+                // var teacher = await _manager.FindByIdAsync(subscribeViewModel.Course.TeacherID);
+           
+
+                course.SummaryStudentsNumber++;
+                await _courseService.UpdateCourse(course);
+
+                var es = new EmailSender();
+            }
+            catch(Exception e)
+            {
+
+            }
           // await es.SendEmailAsync(course.TeacherInfo.Email, "course enroll", "on your course enrolled");
 
             return RedirectToAction(nameof(Index));

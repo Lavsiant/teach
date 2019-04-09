@@ -105,7 +105,7 @@ namespace TeachMe.Controllers
             if (!ModelState.IsValid)
             {
                 return View(model);
-            }
+            }          
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -147,18 +147,7 @@ namespace TeachMe.Controllers
                     throw new ApplicationException($"Unexpected error occurred setting user additional properties for user with ID '{user.Id}'.");
                 }
             }
-
-            if (model.Sertificat != null)
-            {
-                var fileName = Path.Combine($"{_appEnvironment.WebRootPath}\\images\\certificates\\", Path.GetFileName(model.Sertificat.FileName));
-                model.Sertificat.CopyTo(new FileStream(fileName, FileMode.Create));
-
-                var helper = await _userManager.GetUserAsync(User);
-                var userino = await _userService.GetUserWithCertificates(helper.Id);
-                userino.Certificats.Add(new CString() { value = model.Sertificat.FileName });
-                await _userManager.UpdateAsync(userino);
-            }
-     
+      
 
             if (model.Image != null)
             {
@@ -172,6 +161,25 @@ namespace TeachMe.Controllers
                 {
                     throw new ApplicationException($"Unexpected error occurred setting user additional properties for user with ID '{user.Id}'.");
                 }
+            }
+
+            var id = user.Id;
+            _userManager.Dispose();
+            try
+            {
+                if (model.Sertificat != null)
+                {
+                    var fileName = Path.Combine($"{_appEnvironment.WebRootPath}\\images\\certificates\\", Path.GetFileName(model.Sertificat.FileName));
+                    var ss = new FileStream(fileName, FileMode.Create);
+                    model.Sertificat.CopyTo(ss);
+                    ss.Dispose();
+                    await _userService.UpdateUserCertificates(id, model.Sertificat.FileName);
+                    //var userino = await _userService.GetUserWithCertificates(user.Id);                   
+                }
+            }
+            catch (Exception e)
+            {
+
             }
 
             StatusMessage = "Your profile has been updated";
