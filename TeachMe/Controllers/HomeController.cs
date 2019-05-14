@@ -58,6 +58,96 @@ namespace TeachMe.Controllers
             return View();
         }
 
+        public bool CheckIfCourseRaterValid(string userId, ApplicationUser user, Course course)
+        {
+
+            if (course.TeacherID == userId)
+            {
+                return false;
+            }
+
+            bool raterMarker = false;
+
+            foreach (var item in user.LessonsList)
+            {
+                if (item.CourseTittle == course.Title)
+                {
+                    raterMarker = true;
+                }
+            }
+            if (raterMarker)
+            {
+                foreach (var mark in course.Marks)
+                {
+                    if (mark.RaterId == userId)
+                    {
+                        raterMarker = false;
+                    }
+                }
+            }
+            return raterMarker;
+        }
+
+        public bool CheckIfProfileRaterValid(ApplicationUser rater, ApplicationUser teacher)
+        {
+            bool raterMarker = false;
+            if (rater.Id == teacher.Id)
+            {
+                return false;
+            }
+
+            foreach (var item in rater.LessonsList)
+            {
+                if (item.TeacherId == teacher.Id)
+                {
+                    raterMarker = true;
+                }
+            }
+
+            if (raterMarker)
+            {
+                foreach (var mark in teacher.Marks)
+                {
+                    if (mark.RaterId == rater.Id)
+                    {
+                        raterMarker = false;
+                    }
+                }
+            }
+            return raterMarker;
+        }
+
+        public bool CheckIfValidToSubscribe(string courseTitle, ApplicationUser user)
+        {
+            bool marker = true;
+
+            foreach (var item in user.LessonsList)
+            {
+                if (item.CourseTittle.Equals(courseTitle))
+                {
+                    marker = false;
+                }
+            }
+            return marker;
+        }
+
+        public bool CheckIfCommentatorValid(ApplicationUser commentator,ApplicationUser teacher)
+        {
+            bool result = false;
+            foreach (var item in commentator.StudentCourses)
+            {
+                foreach (var c in teacher.CreatedCourses)
+                {
+                    if (item.value.Equals(c.Title))
+                    {
+                        result = true;
+                    }
+                }
+            }
+            return result;
+        }
+
 
     }
+
 }

@@ -4,51 +4,51 @@
     ViewData["Title"] = "Home Page";
 }
 
-<main id="site-main">
+    <main id="site-main">
 
 
-    <section id="home-search" style="background-image: url('images/home-search.jpg')">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-9 col-lg-7">
-                    <div class="home-search-wrapper">
-                        <div class="home-search-title">
-                            <h2>Более <span>300</span> предметов для вашего обучения!</h2>
-                        </div>
-                        <div class="home-search-form-wrapper">
-                            <form asp-controller="Courses" asp-action="SearchBySubject" method="get" name="search-form" id="search-form">
-                                <input type="text" name="subject" placeholder="What you want to learn">
-                                <button type="submit"><i class="fas fa-search"></i></button>
-                            </form>
-                        </div>
-                        <div class="home-search-suggestions">
-                            <ul class="suggestions-list">
+        <section id="home-search" style="background-image: url('images/home-search.jpg')">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-9 col-lg-7">
+                        <div class="home-search-wrapper">
+                            <div class="home-search-title">
+                                <h2>Более <span>300</span> предметов для вашего обучения!</h2>
+                            </div>
+                            <div class="home-search-form-wrapper">
+                                <form asp-controller="Courses" asp-action="SearchBySubject" method="get" name="search-form" id="search-form">
+                                    <input type="text" name="subject" placeholder="What you want to learn">
+                                    <button type="submit"><i class="fas fa-search"></i></button>
+                                </form>
+                            </div>
+                            <div class="home-search-suggestions">
+                                <ul class="suggestions-list">
 
-                                <li class="suggestion-item">
-                                    <a asp-controller="Courses" asp-action="SearchBySubject" asp-route-subject="PHP">PHP</a>
-                                </li>
-                                <li class="suggestion-item">
-                                    <a asp-controller="Courses" asp-action="SearchBySubject" asp-route-subject="JavaScript">JavaScript</a>
-                                </li>
-                            </ul>
-                            <div class="suggestion-more">
-                                <a asp-controller="Courses" asp-action="Index">Show All<i class="fas fa-long-arrow-alt-right"></i></a>
+                                    <li class="suggestion-item">
+                                        <a asp-controller="Courses" asp-action="SearchBySubject" asp-route-subject="PHP">PHP</a>
+                                    </li>
+                                    <li class="suggestion-item">
+                                        <a asp-controller="Courses" asp-action="SearchBySubject" asp-route-subject="JavaScript">JavaScript</a>
+                                    </li>
+                                </ul>
+                                <div class="suggestion-more">
+                                    <a asp-controller="Courses" asp-action="Index">Show All<i class="fas fa-long-arrow-alt-right"></i></a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section id="new-programs">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section-title">
-                        <h2>New courses</h2>
+        </section>
+        <section id="new-programs">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section-title">
+                            <h2>New courses</h2>
+                        </div>
                     </div>
-                </div>
-                @foreach (var course in Model.NewCourses)
+                    @foreach (var course in Model.NewCourses)
                 {
 
 
@@ -74,18 +74,18 @@
                     </div>
                 }
 
-            </div>
-        </div>
-    </section>
-    <section id="best-programs">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section-title">
-                        <h2>Best courses</h2>
-                    </div>
                 </div>
-                @foreach (var item in Model.BestCourses)
+            </div>
+        </section>
+        <section id="best-programs">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section-title">
+                            <h2>Best courses</h2>
+                        </div>
+                    </div>
+                    @foreach (var item in Model.BestCourses)
                 {
 
 
@@ -99,9 +99,9 @@
                                 <div class="program-stars">
                                     @for (int i = 0; i < item.FinalRating; i++)
                                     {
-                                        <abrr title="@item.FinalRating">
-                                            <span name="stars" class="star"><i class="fas fa-star"></i></span>
-                                        </abrr>
+                                    <abrr title="@item.FinalRating">
+                                        <span name="stars" class="star"><i class="fas fa-star"></i></span>
+                                    </abrr>
                                     }
                                 </div>
                             </div>
@@ -121,19 +121,19 @@
                     </div>
                 }
 
-            </div>
-        </div>
-
-    </section>
-    <section id="best-teachers">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section-title">
-                        <h2>BestTeacher</h2>
-                    </div>
                 </div>
-                @foreach (var item in Model.BestTeachers)
+            </div>
+
+        </section>
+        <section id="best-teachers">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section-title">
+                            <h2>BestTeacher</h2>
+                        </div>
+                    </div>
+                    @foreach (var item in Model.BestTeachers)
                 {
 
 
@@ -157,8 +157,130 @@
                     </div>
                 }
 
+                </div>
             </div>
-        </div>
 
-    </section>
-</main>
+        </section>
+
+        <section id="new-programs">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section-title">
+                            <h2>New courses</h2>
+                        </div>
+                    </div>
+                    @foreach (var course in Model.NewCourses)
+                {
+
+
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <div class="program">
+                            <div class="program-header">
+                                <div class="program-name"><a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@course.Title"><h2>@course.Title</h2></a></div>
+                                <div class="program-price"><span class="price">@course.Price</span>грн</div>
+                            </div>
+                            <div class="program-info-inner">
+                                <div class="info-icon"><i class="far fa-clock"></i></div>
+                                <span class="info-value">@course.ReleaseDate</span>
+                            </div>
+                            <div class="program-info-inner">
+                                <div class="info-icon"><i class="fas fa-book"></i></div>
+                                <span class="info-value"><a asp-controller="Courses" asp-action="Index" asp-route-courseSubject="@course.Subject">@course.Subject</a> </span>
+                            </div>
+                            <div class="program-info-inner">
+                                <div class="info-icon"><i class="fas fa-user"></i></div>
+                                <span class="info-value"><a asp-controller="Profiles" asp-action="Index" asp-route-id="@course.TeacherID">@course.TeacherInfo.FirstName @course.TeacherInfo.LastName</a></span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                </div>
+            </div>
+        </section>
+        <section id="best-programs">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section-title">
+                            <h2>Best courses</h2>
+                        </div>
+                    </div>
+                    @foreach (var item in Model.BestCourses)
+                {
+
+
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <div class="program">
+                            <div class="program-header">
+                                <div class="program-name"><a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@item.Title"><h2>@item.Title</h2></a></div>
+                                <div class="program-price"><span class="price">@item.Price</span>$</div>
+                            </div>
+                            <div class="program-rating">
+                                <div class="program-stars">
+                                    @for (int i = 0; i < item.FinalRating; i++)
+                                    {
+                                    <abrr title="@item.FinalRating">
+                                        <span name="stars" class="star"><i class="fas fa-star"></i></span>
+                                    </abrr>
+                                    }
+                                </div>
+                            </div>
+                            <div class="program-info-inner">
+                                <div class="info-icon"><i class="far fa-clock"></i></div>
+                                <span class="info-value">@item.LessonsNumber</span>
+                            </div>
+                            <div class="program-info-inner">
+                                <div class="info-icon"><i class="fas fa-book"></i></div>
+                                <span class="info-value"><a asp-controller="Courses" asp-action="Index" asp-route-courseSubject="@item.Subject">@item.Subject</a></span>
+                            </div>
+                            <div class="program-info-inner">
+                                <div class="info-icon"><i class="fas fa-user"></i></div>
+                                <span class="info-value"><a asp-controller="Profiles" asp-action="Index" asp-route-id="@item.TeacherID">@item.TeacherInfo.FirstName @item.TeacherInfo.LastName</a></span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                </div>
+            </div>
+
+        </section>
+        <section id="best-teachers">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section-title">
+                            <h2>BestTeacher</h2>
+                        </div>
+                    </div>
+                    @foreach (var item in Model.BestTeachers)
+                {
+
+
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="teacher">
+                            <div class="teacher-photo"><a href="#"><img src="images/teacher.png" alt="teacher name"></a></div>
+                            <div class="teacher-info">
+                                <div class="teacher-name"><a asp-action="Index" asp-controller="Profiles" asp-route-id="@item.Id"><h2>@item.FirstName @item.LastName</h2></a></div>
+                                <div class="teacher-rating">
+                                    <div class="teacher-stars">
+                                        Rating: @item.FinalRating
+                                    </div>
+                                </div>
+                                <div class="teacher-info-inner">
+                                    <div class="info-icon"><i class="fas fa-users"></i></div>
+                                    <span class="info-value">@item.Email</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                </div>
+            </div>
+
+        </section>
+    </main>

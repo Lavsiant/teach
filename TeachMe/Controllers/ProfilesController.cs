@@ -85,6 +85,35 @@ namespace TeachMe.Controllers
 
             return View("../Profiles/Index",await _vmProvider.GetProfileViewModel(teacher,currentUser));
         }
+
+
+          public async Task<IActionResult> Commennt(ProfileViewModel profileViewModel)
+        {
+            
+            var currentUser = await _manager.GetUserAsync(User);
+
+            var teacher = await _userService.GetUserWithComments(profileViewModel.User.Id);
+
+            if (!String.IsNullOrEmpty(profileViewModel.CommentText))
+            {
+                var comment = new Comment()
+                {
+                    CommentatorFullName = $"{currentUser.FirstName} {currentUser.LastName}",
+                    CommentatorId = currentUser.Id,
+                    Date = DateTime.Now,
+                    Text = profileViewModel.CommentText
+                };
+                teacher.Comments.Add(comment);
+                _db.Update(teacher);
+                await _db.SaveChangesAsync();
+               
+               
+            }
+
+            var vm = await _vmProvider.GetProfileViewModel(await _userService.GetUserWithLessonsListAndMarks(teacher.Id), currentUser);
+            vm.CommentText = "";
+            return View("../Profiles/Index",vm);
+        }
     }
 }
 
