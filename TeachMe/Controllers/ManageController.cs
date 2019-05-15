@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using DBRepository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -16,14 +15,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Model.CourseModel;
-using Model.UserModel;
-
+using TeachMe.Data;
 using TeachMe.Models;
 using TeachMe.Models.CourseModels;
 using TeachMe.Models.ManageViewModels;
+using TeachMe.Repositories;
 using TeachMe.Services;
-using TeachMe.Services.Interfaces;
+
 
 namespace TeachMe.Controllers
 {
@@ -33,40 +31,35 @@ namespace TeachMe.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly RepositoryContext _context;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
+        private readonly ApplicationDbContext _context;
         private readonly IHostingEnvironment _appEnvironment;
-        private readonly IViewModelProvider _vmProvider;
-        private readonly ICourseService _courseService;
-        private readonly IUserService _userService;
-
+        private readonly CourseRepository _courseRepository;
+        private readonly UserRepository _userRepository;
+        
 
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
         private const string RecoveryCodesKey = nameof(RecoveryCodesKey);
 
-        public ManageController(RepositoryContext cotext,
+        public ManageController(ApplicationDbContext context,
           UserManager<ApplicationUser> userManager,
           SignInManager<ApplicationUser> signInManager,
           IEmailSender emailSender,
           ILogger<ManageController> logger,
           UrlEncoder urlEncoder,
-            IHostingEnvironment appEnvironment,
-            IViewModelProvider vmprovider, 
-            IUserService userService, 
-            ICourseService courseService)
+            IHostingEnvironment appEnvironment)
         {
+            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
             _urlEncoder = urlEncoder;
             _appEnvironment = appEnvironment;
-            _vmProvider = vmprovider;
-            _userService = userService;
-            _courseService = courseService;
-            _context = cotext;
+            _userRepository = new UserRepository(_context);
+            _courseRepository = new CourseRepository(_context);
         }
 
         [TempData]
@@ -105,7 +98,7 @@ namespace TeachMe.Controllers
             if (!ModelState.IsValid)
             {
                 return View(model);
-            }          
+            }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -147,7 +140,18 @@ namespace TeachMe.Controllers
                     throw new ApplicationException($"Unexpected error occurred setting user additional properties for user with ID '{user.Id}'.");
                 }
             }
-      
+
+            if (model.Sertificat != null)
+            {
+                var fileName = Path.Combine($"{_appEnvironment.WebRootPath}\\images\\certificates\\", Path.GetFileName(model.Sertificat.FileName));
+                model.Sertificat.CopyTo(new FileStream(fileName, FileMode.Create));
+
+                var helper = await _userManager.GetUserAsync(User);
+                var userino = _userRepository.GetUserWithCertificates(helper.Id);
+                userino.Certificats.Add(new CString() { value = model.Sertificat.FileName });
+                await _userManager.UpdateAsync(userino);
+            }
+     
 
             if (model.Image != null)
             {
@@ -163,25 +167,6 @@ namespace TeachMe.Controllers
                 }
             }
 
-            var id = user.Id;
-            _userManager.Dispose();
-            try
-            {
-                if (model.Sertificat != null)
-                {
-                    var fileName = Path.Combine($"{_appEnvironment.WebRootPath}\\images\\certificates\\", Path.GetFileName(model.Sertificat.FileName));
-                    var ss = new FileStream(fileName, FileMode.Create);
-                    model.Sertificat.CopyTo(ss);
-                    ss.Dispose();
-                    await _userService.UpdateUserCertificates(id, model.Sertificat.FileName);
-                    //var userino = await _userService.GetUserWithCertificates(user.Id);                   
-                }
-            }
-            catch (Exception e)
-            {
-
-            }
-
             StatusMessage = "Your profile has been updated";
             return RedirectToAction(nameof(Index));
         }
@@ -190,7 +175,7 @@ namespace TeachMe.Controllers
         public async Task<IActionResult> EditStreamInfo()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            var user = await _userService.GetUserWithStreamInfo(currentUser.Id);
+            var user = _userRepository.GetUserWithStreamInfo(currentUser.Id);
 
             var model = new StreamViewModel()
             {
@@ -205,15 +190,14 @@ namespace TeachMe.Controllers
         public async Task<IActionResult> EditStreamInfo(StreamViewModel model)
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            var user = await _userService.GetUserWithStreamInfo(currentUser.Id);
+            var user = _userRepository.GetUserWithStreamInfo(currentUser.Id);
 
             if(model.Tittle != user.Stream.StreamTIttle || model.StreamLink != model.StreamLink)
             {
                 user.Stream.StreamTIttle = model.Tittle;
                 user.Stream.StreamLink = model.StreamLink;
-                await _userManager.UpdateAsync(user);
-                
-             
+                 _context.Update(user);
+                await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
@@ -232,7 +216,7 @@ namespace TeachMe.Controllers
             vm.Image.CopyTo(new FileStream(fileName, FileMode.Create));
 
             var helper = await _userManager.GetUserAsync(User);
-            var user = await _userService.GetUserWithCertificates(helper.Id);
+            var user = _userRepository.GetUserWithCertificates(helper.Id);
             user.Certificats.Add(new CString() { value = vm.Image.FileName });
             await _userManager.UpdateAsync(user);
 
@@ -243,43 +227,48 @@ namespace TeachMe.Controllers
         public async Task<IActionResult> Shedule()
         {
             var helperUser = await _userManager.GetUserAsync(User);
-            var user = await _userService.GetUserWithLessonsList(helperUser.Id);
+            var user = _userRepository.GetUserWithLessonsList(helperUser.Id);
             var scheduleService = new FormingScheduleService();
             //var studentLessons = new List<UserLesson>();
             //var teacherLessons= new List<UserLesson>();
             var studentLessons = scheduleService.FillUsersStudentSchedule(user, _context);
             var teacherLessons = scheduleService.FillUsersTeacherSchedule(user, _context);
 
+            var vmProvider = new ViewModelsProvider();
+
             var currentUser = await _userManager.GetUserAsync(User);
-            return View(_vmProvider.GetSheduleViewModel(studentLessons,teacherLessons,currentUser.Id));
+            return View(vmProvider.GetSheduleViewModel(studentLessons,teacherLessons,currentUser.Id));
         }
-              
+
+     
+        
+     
 
         public async Task<IActionResult> DeleteTeacherCourse(string courseTittle, int startLessonHour, int startLessonMinute, string weekDay, string studentId,string teacherId)
         {
-            var course = await _courseService.GetCourseWithLessonsByTittle(courseTittle);
+            var course = _courseRepository.GetCourseWithLessonsByTittle(courseTittle);
             DayOfWeek dow;
             Enum.TryParse(weekDay, out dow);
 
-            await _courseService.ReleaseLesson(course, new CourseLesson() { StartLessonTime = new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), isBusy = true, WeekDay = dow });
-            await _userService.DeleteUserCourse(dow, new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), courseTittle, studentId);
+            await _courseRepository.ReleaseLesson(course, new CourseLesson() { StartLessonTime = new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), isBusy = true, WeekDay = dow });
+            await _userRepository.DeleteUserCourse(dow, new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), courseTittle, studentId);
 
             var user = await _userManager.GetUserAsync(User);
-            await _userService.DeleteUserCourse(dow, new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), courseTittle, user.Id);
+            await _userRepository.DeleteUserCourse(dow, new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), courseTittle, user.Id);
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> DeleteStudentCourse(string courseTittle, int startLessonHour, int startLessonMinute, string weekDay, string studentId)
         {
-            var course = await _courseService.GetCourseWithLessonsByTittle(courseTittle);
+            var course = _courseRepository.GetCourseWithLessonsByTittle(courseTittle);
             DayOfWeek dow;
             Enum.TryParse(weekDay, out dow);
 
-            await  _courseService.ReleaseLesson(course, new CourseLesson() { StartLessonTime = new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), isBusy = true, WeekDay = dow });
-            await _userService.DeleteUserCourse(dow, new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), courseTittle, course.TeacherID);
+            await _courseRepository.ReleaseLesson(course, new CourseLesson() { StartLessonTime = new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), isBusy = true, WeekDay = dow });
+            await _userRepository.DeleteUserCourse(dow, new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), courseTittle, course.TeacherID);
 
             var user = await _userManager.GetUserAsync(User);
-            await _userService.DeleteUserCourse(dow, new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), courseTittle, user.Id);
+            await _userRepository.DeleteUserCourse(dow, new DateTime(1, 1, 1, startLessonHour, startLessonMinute, 0), courseTittle, user.Id);
             return RedirectToAction(nameof(Index));
         }
 

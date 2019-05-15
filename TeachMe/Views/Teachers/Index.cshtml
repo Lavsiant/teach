@@ -12,35 +12,24 @@
             <div class="col">
 
                 <div id="teacher-filter">
-                    @*<form action="" method="" name="" class="form-style-1">
+                    <form asp-controller="Teachers" asp-action="Index" method="get">
+                        <p>
+                            @*Category: <select asp-for="courseCategory" asp-items="Model.categories">
+                                <option value="">All</option>
+                            </select>*@
 
-                        <label>
-                            Категория<select name="">
-                                <option value="">Категория-1</option>
-                                <option value="">Категория-2</option>
-                                <option value="">Категория-3</option>
-                            </select>
-                        </label>
+                            @*Sort by: <select asp-for="sortCriteria" asp-items="Model.sortCrtiteriaList">
+                    <option value="">Don't sort</option>
+                </select>*@
 
-                        <label>
-                            Предмет<select name="">
-                                <option value="">Предмет-1</option>
-                                <option value="">Предмет-2</option>
-                                <option value="">Предмет-3</option>
-                            </select>
-                        </label>
+                Name: <input type="text" name="name">
+                Minimal rating: <input type="number" min="0" max="5" name="rating">
+                            <input type="submit" value="Filter" />
 
-                        <label>
-                            Сортировать по<select name="">
-                                <option value="">Названию</option>
-                                <option value="">Рейтингу</option>
-                                <option value="">Кол-ву учеников</option>
-                            </select>
-                        </label>
 
-                        <button type="submit">Фильтровать</button>
+                        </p>
 
-                    </form>*@
+                    </form>
                 </div>
 
                 <div class="teachers-list">
@@ -70,7 +59,7 @@
                                             <div class="info-icon"><i class="fas fa-book"></i></div>
                                             @foreach (var item in teacher.CreatedCourses)
                                             {
-                                                <span class="info-value"><a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@item.Title">@item.Title</a></span>
+                                                <span class="info-value"><a asp-controller="Courses" asp-action="FinalSearchByName" asp-route-searchString="@item.value">@item.value</a></span>
                                             }
 
                                          

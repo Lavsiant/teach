@@ -3,37 +3,7 @@
 @{
     ViewData["Title"] = "Subscribe";
 }
-<script>
-    var requiredBoxes = 3;
 
-    // Select checkboxes
-    var checkbox = $("input:regex(id,*Lesso*)");
-    // var required = 0;
-    var checkedBoxes = 0;
-
-    checkbox.on('click', function () {
-        selectCheckbox(requiredBoxes);
-    });
-
-    function selectCheckbox() {
-
-        var target = $(event.target);
-
-        if (!target.closest(checkbox.not(':checked')).length) {
-
-            checkedBoxes++;
-
-            if (checkedBoxes === 1) {
-                checkbox.not(':checked').prop('disabled', true);
-            }
-
-        } else {
-            checkedBoxes--;
-            checkbox.prop('disabled', false);
-        }
-    }</script>
-
-<script src="~/js/main.js"></script>
 
 
 
@@ -42,41 +12,42 @@
         <div class="row">
             <div class="col">
                 <div class="enroll-course-inner">
-                    <form asp-action="Subscribe" id="enroll-course-form" class="form-style-1">
+                    <form asp-action="Subscribe" id="form" class="form-style-1">
 
                         <h3 class="form-title">Course enroll "@Model.Course.Title"</h3><br />
-                        <h2  class="form-title">Select @Model.Course.LessonsNumber lessons</h2>
+                        <h2 class="form-title">Select @Model.Course.LessonsNumber lessons</h2>
 
                         <input type="hidden" asp-for="@Model.Course.ID" />
                         <input type="hidden" asp-for="@Model.Course.TeacherID" />
 
+                        <div style="display: flex; text-align: center; margin: auto;">
+                            @foreach (var item in Model.WorkDays)
+                            {
+                                <div class="day-wrapper" style="margin-left: 30px; margin-right: 10px;">
+                                    <h6 class="day">@item.ToString()</h6>
+                                    <div class="day-inner">
 
-                        @foreach (var item in Model.WorkDays)
-                        {
-                            <div class="day-wrapper">
-                                <h6 class="day">@item.ToString()</h6>
-                                <div class="day-inner">
-
-                                    @for (int i = 0; i < Model.Lessons.Count; i++)
-                                    {
-                                        if (Model.Lessons[i].WeekDay == item && !Model.Lessons[i].isBusy)
+                                        @for (int i = 0; i < Model.Lessons.Count; i++)
                                         {
-                                            <div class="time">
-                                                <label>
-                                                    @Model.Lessons[i].StartLessonTime.Hour:@Model.Lessons[i].StartLessonTime.Minute-@Model.Lessons[i].EndLessonTime.Hour:@Model.Lessons[i].EndLessonTime.Minute
-                                                    @Html.CheckBoxFor(x => Model.Lessons[i].isBusy)
-                                                </label>
-                                                <input type="hidden" asp-for="@Model.Lessons[i].StartLessonTime" />
-                                                <input type="hidden" asp-for="@Model.Lessons[i].EndLessonTime" />
-                                                <input type="hidden" asp-for="@Model.Lessons[i].WeekDay" />
-                                            </div>
+                                            if (Model.Lessons[i].WeekDay == item && !Model.Lessons[i].isBusy)
+                                            {
+                                                <div class="time">
+                                                    <label>
+                                                        @Model.Lessons[i].StartLessonTime.Hour:@Model.Lessons[i].StartLessonTime.Minute-@Model.Lessons[i].EndLessonTime.Hour:@Model.Lessons[i].EndLessonTime.Minute
+                                                        @Html.CheckBoxFor(x => Model.Lessons[i].isBusy)
+                                                    </label>
+                                                    <input type="hidden" asp-for="@Model.Lessons[i].StartLessonTime" />
+                                                    <input type="hidden" asp-for="@Model.Lessons[i].EndLessonTime" />
+                                                    <input type="hidden" asp-for="@Model.Lessons[i].WeekDay" />
+                                                </div>
+                                            }
                                         }
-                                    }
+                                    </div>
                                 </div>
-                            </div>
 
-                        }
-                  
+                            }
+                         </div>
+
 
 
                         <div class="form-title">
@@ -89,3 +60,40 @@
     </div>
 
 </section>
+
+<script>
+    var requiredBoxes = @Model.LessonNumber;
+
+    // Select checkboxes
+    var checkbox = $("input:checkbox");
+    // var required = 0;
+    var checkedBoxes = 0;
+
+
+    $("form#form :input").each(function () {
+        var input = $(this); // This is the jquery object of the input, do what you will
+        input.on('click', function () {
+            selectCheckbox(requiredBoxes);
+        });
+    });
+
+
+    function selectCheckbox() {
+
+        var target = $(event.target);
+
+        if (!target.closest(checkbox.not(':checked')).length) {
+
+            checkedBoxes++;
+
+            if (checkedBoxes === requiredBoxes) {
+                checkbox.not(':checked').prop('disabled', true);
+            }
+
+        } else {
+            checkedBoxes--;
+            checkbox.prop('disabled', false);
+        }
+    }</script>
+
+<script src="~/js/main.js"></script>

@@ -1,5 +1,5 @@
 ﻿@model TeachMe.Models.CourseModels.DetailsViewModel
-@using Model.UserModel;
+
 @{
     ViewData["Title"] = "Details";
 }
@@ -28,12 +28,12 @@
                                 <div class="program-rating">
                                     <div class="program-stars">
                                         @for (int i = 0; i < Model.Course.FinalRating; i++)
-                                        {
-                                            <abrr title="@Model.Course.FinalRating">
-                                                <span name="stars" class="star"><i class="fas fa-star"></i></span>
-                                            </abrr>
-                                        }
-
+    {
+                                    <abrr title="@Model.Course.FinalRating">
+                                        <span name="stars" class="star"><i class="fas fa-star"></i></span>
+                                    </abrr>
+}
+                                      
                                     </div>
 
                                 </div>
@@ -149,7 +149,7 @@
         <div>
             @if (UserManager.GetUserId(User) == Model.Course.TeacherID)
             {
-                @*<a asp-action="Edit" asp-route-id="@Model.Course.ID">Edit</a>*@
+                <a asp-action="Edit" asp-route-id="@Model.Course.ID">Edit</a>
                 @if (Model.Course.IsActive)
                 {
                     <a asp-action="Delete" asp-route-id="@Model.Course.ID">Unactive</a>

@@ -1,12 +1,10 @@
-﻿using DBRepository;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Model.CourseModel;
-using Model.UserModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TeachMe.Data;
 using TeachMe.Models;
 using TeachMe.Models.CourseModels;
 
@@ -58,11 +56,7 @@ namespace TeachMe.Services
 
                         }
                     }
-                    try
-                    {
-                        curDate = curDate.AddDays(1);
-                    }
-                    catch { }
+                    curDate = curDate.AddDays(1);
                     int temp = j + 1;
                     if (temp == startIndex)
                     {
@@ -117,8 +111,10 @@ namespace TeachMe.Services
             return schedule;
         }
 
-        public List<CourseLesson> GetAvalibleLessons(ApplicationUser user, Course course,string userId)
-        {                      
+        public List<CourseLesson> GetAvalibleLessons(ApplicationDbContext context, Course course,string userId)
+        {
+            
+            var user = context.Users.Include(x => x.LessonsList).FirstOrDefault(x => x.Id == userId);
             var lessons = new List<CourseLesson>();
             foreach (var lesson in course.LessonSchedule.Where(x => !x.isBusy).OrderBy(x => x.WeekDay).ThenBy(x => x.StartLessonTime))
             {
@@ -138,7 +134,7 @@ namespace TeachMe.Services
             return lessons;
         }
 
-        public List<CourseLesson> GetAvalibleLessonsForTeacher(RepositoryContext context, Course course, string userId)
+        public List<CourseLesson> GetAvalibleLessonsForTeacher(ApplicationDbContext context, Course course, string userId)
         {
 
             var user = context.Users.Include(x => x.LessonsList).FirstOrDefault(x => x.Id == userId);
@@ -163,7 +159,7 @@ namespace TeachMe.Services
             return lessons;
         }
 
-        public List<UserCourse> FillUsersStudentSchedule( ApplicationUser user, RepositoryContext context)
+        public List<UserCourse> FillUsersStudentSchedule( ApplicationUser user, ApplicationDbContext context)
         {
             var studentLessons = new List<UserCourse>();
             foreach (var lesson in user.LessonsList)
@@ -178,7 +174,7 @@ namespace TeachMe.Services
             return studentLessons;
         }
 
-        public List<UserCourse> FillUsersTeacherSchedule( ApplicationUser user, RepositoryContext context)
+        public List<UserCourse> FillUsersTeacherSchedule( ApplicationUser user, ApplicationDbContext context)
         {
             var teacherLessons = new List<UserCourse>();
             foreach (var lesson in user.LessonsList)

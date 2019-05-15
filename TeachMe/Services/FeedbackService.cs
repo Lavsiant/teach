@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Model.CourseModel;
-using Model.UserModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TeachMe.Data;
+
 using TeachMe.Models;
 using TeachMe.Models.CourseModels;
 
@@ -12,7 +12,7 @@ namespace TeachMe.Services
 {
     public class FeedbackService
     {
-        public bool CheckIfCourseRaterValid(string userId, ApplicationUser user, Course course)
+        public bool CheckIfCourseRaterValid(string userId, ApplicationDbContext context, Models.CourseModels.Course course)
         {
 
             if (course.TeacherID == userId)
@@ -22,7 +22,7 @@ namespace TeachMe.Services
 
             bool raterMarker = false;
 
-            foreach (var item in user.LessonsList)
+            foreach (var item in context.Users.Include(x => x.LessonsList).FirstOrDefault(x => x.Id == userId).LessonsList)
             {
                 if (item.CourseTittle == course.Title)
                 {
@@ -92,7 +92,7 @@ namespace TeachMe.Services
             {
                 foreach (var c in teacher.CreatedCourses)
                 {
-                    if (item.value.Equals(c.Title))
+                    if (item.value.Equals(c.value))
                     {
                         result = true;
                     }
@@ -101,17 +101,17 @@ namespace TeachMe.Services
             return result;
         }
 
-        public bool CheckIfReadyForCreate(ApplicationUser teacher)
+        public bool CheckIfReadyForCreate(ApplicationUser teacher, ApplicationDbContext context)
         {
-            //var courses = context.Course.Where(x => x.TeacherID == teacher.Id && x.IsActive).ToList();
-            //if (courses.Count > 0)
-            //{
-            //    return false;
-            //}
-            //else
-            //{
+            var courses = context.Course.Where(x => x.TeacherID == teacher.Id && x.IsActive).ToList();
+            if (courses.Count > 0)
+            {
+                return false;
+            }
+            else
+            {
                 return true;
-           // }
+            }
           
         }
 

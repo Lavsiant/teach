@@ -1,5 +1,4 @@
 ﻿@model TeachMe.Models.CourseModels.CourseViewModels.CreateCourseViewModel
-@using Model.CourseModel
 
 @{
     ViewData["Title"] = "Create";
@@ -27,7 +26,7 @@
 
             <div class="form-group">
                 <label asp-for="@Model.Course.Category" class="control-label"></label>
-                <select asp-for="@Model.Course.Category" asp-items="@(Html.GetEnumSelectList<CourseCategory>())" class="form-control"></select>
+                <select asp-for="@Model.Course.Category" asp-items="@(Html.GetEnumSelectList<TeachMe.Models.CourseModels.CourseCategory>())" class="form-control"></select>
                 <span asp-validation-for="@Model.Course.Category" class="text-danger"></span>
             </div>
             <div class="form-group">
