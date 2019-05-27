@@ -14,7 +14,7 @@
                 <div class="enroll-course-inner">
                     <form asp-action="Subscribe" id="form" class="form-style-1">
 
-                        <h3 class="form-title">Course enroll "@Model.Course.Title"</h3><br />
+                        <h3 class="form-title" style="    margin-bottom: -15px">Course enroll "@Model.Course.Title"</h3><br />
                         <h2 class="form-title">Select @Model.Course.LessonsNumber lessons</h2>
 
                         <input type="hidden" asp-for="@Model.Course.ID" />
@@ -23,34 +23,109 @@
                         <div style="display: flex; text-align: center; margin: auto;">
                             @foreach (var item in Model.WorkDays)
                             {
-                                <div class="day-wrapper" style="margin-left: 30px; margin-right: 10px;">
-                                    <h6 class="day">@item.ToString()</h6>
-                                    <div class="day-inner">
+                            <div class="day-wrapper" style="width:180px; 30px; border-width:3px; margin-right: 10px;  border: 1px solid; padding: 10px; box-shadow: 5px 10px 18px #888888;">
+                                <h6 class="day">@item.ToString()</h6>
+                                <div class="day-inner">
 
-                                        @for (int i = 0; i < Model.Lessons.Count; i++)
+                                    @for (int i = 0; i < Model.Lessons.Count; i++)
                                         {
                                             if (Model.Lessons[i].WeekDay == item && !Model.Lessons[i].isBusy)
                                             {
-                                                <div class="time">
-                                                    <label>
-                                                        @Model.Lessons[i].StartLessonTime.Hour:@Model.Lessons[i].StartLessonTime.Minute-@Model.Lessons[i].EndLessonTime.Hour:@Model.Lessons[i].EndLessonTime.Minute
-                                                        @Html.CheckBoxFor(x => Model.Lessons[i].isBusy)
-                                                    </label>
-                                                    <input type="hidden" asp-for="@Model.Lessons[i].StartLessonTime" />
-                                                    <input type="hidden" asp-for="@Model.Lessons[i].EndLessonTime" />
-                                                    <input type="hidden" asp-for="@Model.Lessons[i].WeekDay" />
-                                                </div>
+                                    <div class="time">
+                                        <label>
+                                            @if (Model.Lessons[i].StartLessonTime.Hour < 10)
+                                                        {
+                                                            if (Model.Lessons[i].StartLessonTime.Minute < 10)
+                                                            {
+
+                                            <label style="display:-webkit-inline-box;">
+                                                <label>0</label>@Model.Lessons[i].StartLessonTime.Hour:<label>0</label>@Model.Lessons[i].StartLessonTime.Minute
+                                            </label>
+
+                                                            }
+                                                            else
+                                                            {
+                                            <label style="display:-webkit-inline-box;">
+                                                <label>0</label>@Model.Lessons[i].StartLessonTime.Hour:@Model.Lessons[i].StartLessonTime.Minute
+                                            </label>
+                                                            }
+
+                                                        }
+                                                        else
+                                                        {
+                                                            if (Model.Lessons[i].StartLessonTime.Minute < 10)
+                                                            {
+
+                                            <label style="display:-webkit-inline-box;">
+                                                @Model.Lessons[i].StartLessonTime.Hour:<label>0</label>@Model.Lessons[i].StartLessonTime.Minute
+                                            </label>
+
+                                                            }
+                                                            else
+                                                            {
+                                            <label style="display:-webkit-inline-box;">
+                                                @Model.Lessons[i].StartLessonTime.Hour:@Model.Lessons[i].StartLessonTime.Minute
+                                            </label>
+                                                            }
+                                                        } -
+                                            @if (Model.Lessons[i].EndLessonTime.Hour < 10)
+                                                        {
+                                                            if (Model.Lessons[i].EndLessonTime.Minute < 10)
+                                                            {
+
+                                            <label style="display:-webkit-inline-box;">
+                                                <label>0</label>@Model.Lessons[i].EndLessonTime.Hour:<label>0</label>@Model.Lessons[i].EndLessonTime.Minute
+                                            </label>
+
+                                                            }
+                                                            else
+                                                            {
+                                            <label style="display:-webkit-inline-box;">
+                                                <label>0</label>@Model.Lessons[i].EndLessonTime.Hour:@Model.Lessons[i].EndLessonTime.Minute
+                                            </label>
+                                                            }
+
+                                                        }
+                                                        else
+                                                        {
+                                                            if (Model.Lessons[i].EndLessonTime.Minute < 10)
+                                                            {
+
+                                            <label style="display:-webkit-inline-box;">
+                                                @Model.Lessons[i].EndLessonTime.Hour:<label>0</label>@Model.Lessons[i].EndLessonTime.Minute
+                                            </label>
+
+                                                            }
+                                                            else
+                                                            {
+                                            <label style="display:-webkit-inline-box;">
+                                                @Model.Lessons[i].EndLessonTime.Hour:@Model.Lessons[i].EndLessonTime.Minute
+                                            </label>
+                                                            }
+                                                        }
+                                            <div style="margin-top: -35px;">
+                                                @Html.CheckBoxFor(x => Model.Lessons[i].isBusy)
+
+                                            </div>
+
+                                        </label>
+
+
+                                        <input type="hidden" asp-for="@Model.Lessons[i].StartLessonTime" />
+                                        <input type="hidden" asp-for="@Model.Lessons[i].EndLessonTime" />
+                                        <input type="hidden" asp-for="@Model.Lessons[i].WeekDay" />
+                                    </div>
                                             }
                                         }
-                                    </div>
                                 </div>
+                            </div>
 
                             }
-                         </div>
+                        </div>
 
 
 
-                        <div class="form-title">
+                        <div class="form-title" style="margin-top:30px">
                             <input type="submit" value="Pay" id="enroll-course-btn" />
                         </div>
                     </form>
@@ -68,7 +143,9 @@
     var checkbox = $("input:checkbox");
     // var required = 0;
     var checkedBoxes = 0;
-
+    if (checkedBoxes < requiredBoxes) {
+        document.getElementById("enroll-course-btn").disabled = true;
+    }
 
     $("form#form :input").each(function () {
         var input = $(this); // This is the jquery object of the input, do what you will
@@ -88,11 +165,13 @@
 
             if (checkedBoxes === requiredBoxes) {
                 checkbox.not(':checked').prop('disabled', true);
+                document.getElementById("enroll-course-btn").disabled = false;
             }
 
         } else {
             checkedBoxes--;
             checkbox.prop('disabled', false);
+              document.getElementById("enroll-course-btn").disabled = true;
         }
     }</script>
 

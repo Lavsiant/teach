@@ -77,14 +77,51 @@
 
                                 <div class="info-inner">
 
+
                                     <div class="program-description">
                                         <p>
                                             Release date: @Model.Course.ReleaseDate <br />
                                             Lesson per week: @Model.Course.LessonsNumber <br />
-                                            Lesson duration: @Model.Course.Duration.Hours:@Model.Course.Duration.Minutes
+
+                                            @if (@Model.Course.Duration.Hours < 10)
+                                            {
+                                                if (@Model.Course.Duration.Minutes < 10)
+                                                {
+
+                                        <p style="font-size: 14px; color: #8a8a8a; display:-webkit-inline-box;">
+                                            Lesson duration: <label style="font-size: 14px; color: #8a8a8a;">0</label>  @Model.Course.Duration.Hours:<label style="font-size: 14px; color: #8a8a8a;">0</label>@Model.Course.Duration.Minutes
                                         </p>
+
+                                                }
+                                                else
+                                                {
+                                        <p style="font-size: 14px; color: #8a8a8a;display:-webkit-inline-box;">
+                                            Lesson duration: <label style="font-size: 14px; color: #8a8a8a;">0</label>  @Model.Course.Duration.Hours:@Model.Course.Duration.Minutes
+                                        </p>
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                if (@Model.Course.Duration.Minutes < 10)
+                                                {
+
+                                        <p style="font-size: 14px; color: #8a8a8a;display:-webkit-inline-box;">
+                                            Lesson duration:  @Model.Course.Duration.Hours:<label style="font-size: 14px; color: #8a8a8a;">0</label>@Model.Course.Duration.Minutes
+                                        </p>
+
+                                                }
+                                                else
+                                                {
+                                        <p style="display:-webkit-inline-box;">
+                                            Lesson duration:  @Model.Course.Duration.Hours:@Model.Course.Duration.Minutes
+                                        </p>
+                                                }
+                                            }
+
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
                                 @if (Model.Course.TeacherID != UserManager.GetUserId(User) && Model.Course.IsActive && Model.IsValidForSubscribe)
                                 {
                                     <button type="button"><a asp-action="Subscribe" asp-route-id="@Model.Course.ID"><font color="white">Subscribe</font></a></button>
